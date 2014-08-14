@@ -43,12 +43,12 @@ Puppet::Type.newtype :underscore_bit_file do
 
 	def bits
 		catalog.resources.select do |r|
-			r.type == "Underscore_bit_file" and r[:path] == self[:path]
+			r.type == "Underscore_bit_file_bit" and r[:path] == self[:path]
 		end
 	end
 	
 	def content
-		bits.sort_by { |r| r[:ordinal] }.map { |r| r[:content] }.join("\n")
+		bits.sort_by { |r| [r[:ordinal], r[:content]] }.map { |r| r[:content] }.join("\n")
 	end
 
 	def generate
