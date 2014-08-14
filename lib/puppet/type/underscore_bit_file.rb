@@ -48,7 +48,7 @@ Puppet::Type.newtype :underscore_bit_file do
 	end
 	
 	def content
-		bits.sort_by { |r| [r[:ordinal], r[:content]] }.map { |r| r[:content] }.join("\n")
+		bits.sort_by { |r| [r[:ordinal], r[:content]] }.map { |r| r[:content] }.join("\n") + "\n"
 	end
 
 	def generate
