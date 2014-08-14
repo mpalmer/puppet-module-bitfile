@@ -43,7 +43,7 @@ Puppet::Type.newtype :underscore_bit_file do
 
 	def bits
 		catalog.resources.select do |r|
-			r.type == "Underscore_bit_file_bit" and r[:path] == self[:path]
+			r.type == :underscore_bit_file_bit and r[:path] == self[:path]
 		end
 	end
 	
