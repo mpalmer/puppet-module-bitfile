@@ -46,22 +46,29 @@ Puppet::Type.newtype :underscore_bit_file do
 			r.type == :underscore_bit_file_bit and r[:path] == self[:path]
 		end
 	end
-	
+
 	def content
 		bits.sort_by { |r| [r[:ordinal], r[:content]] }.map { |r| r[:content] }.join("\n") + "\n"
 	end
 
 	def generate
-		meta_attrs = Puppet::Type.metaparams.inject({}) { |h, m| h[m] = self[m]; h }
+		f = Puppet::Type.type(:file).new(
+		                               :path    => self[:path],
+		                               :content => content,
+		                               :mode    => self[:mode],
+		                               :owner   => self[:owner],
+		                               :group   => self[:group],
+		                               :catalog => self.catalog,
+		                             )
 
-		file_attrs = meta_attrs.merge(
-		               :path => self[:path],
-		               :content => content,
-		               :mode    => self[:mode],
-		               :owner   => self[:owner],
-		               :group   => self[:group]
-		).delete_if { |k,v| v.nil? }
+		debug "Generated bitfile: #{f.ref}"
 
-		[Puppet::Type.type(:file).new(file_attrs)]
+		self.parameters.each do |name, param|
+			f[name] = param.value if param.metaparam?
+		end
+
+		f.builddepends.each { |e| f.catalog.relationship_graph.add_edge(e) }
+
+		[f]
 	end
 end
