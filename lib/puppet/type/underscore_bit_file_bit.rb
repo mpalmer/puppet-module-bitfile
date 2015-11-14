@@ -2,10 +2,16 @@ Puppet::Type.newtype :underscore_bit_file_bit do
 	desc <<-EOF.gsub(/^\t\t/, '')
 		Represents a single chunk in a bitfile.  This type doesn't really do
 		anything of its own; it just sits around waiting to be collected by
-		`_bit_file`.  Which bits belong to which file are sorted out with
-		`path`; the order in which the bits are glued together is taken from
-		the `ordinal` attribute; this must be a non-negative integer.  The
-		ordering of bits with the same `ordinal` is not specified.
+		`_bit_file`.
+
+		Which bits belong to which file are sorted out with `path`.  The
+		`_bit_file` type will collect all the `_bit_file_bit` resources which
+		have the same `path` as the `_bit_file` resource's title (namevar).
+
+		The order in which the bits are put together is dependent on both the
+		`ordinal` parameter, as well as a simple tree hierarchy.  Any bit which
+		has a `parent` attribute will be render after the parent's contents, but before
+		the content of the next bit after the parent.
 	EOF
 
 	newparam :name do
@@ -33,6 +39,21 @@ Puppet::Type.newtype :underscore_bit_file_bit do
 		end
 	end
 
+	newparam :parent do
+		desc <<-EOF.gsub(/^\t\t\t/, '')
+			Identifies the "parent" bit.
+		EOF
+
+		defaultto :undef
+
+		validate do |parent|
+			unless parent == :undef or parent.is_a? String
+				raise ArgumentError,
+				      "`:parent` must be a string"
+			end
+		end
+	end
+
 	newparam :content do
 		desc <<-EOF.gsub(/^\t\t\t/, '')
 			What is in this bit.
@@ -42,6 +63,21 @@ Puppet::Type.newtype :underscore_bit_file_bit do
 			unless content.is_a? String
 				raise ArgumentError,
 				      "`:content` must be a string"
+			end
+		end
+	end
+
+	newparam :closing_content do
+		desc <<-EOF.gsub(/^\t\t\t/, '')
+			An optional string which will be printed after any child bits.
+		EOF
+
+		defaultto ''
+
+		validate do |content|
+			unless content.is_a? String
+				raise ArgumentError,
+				      "`:closing_content` must be a string"
 			end
 		end
 	end

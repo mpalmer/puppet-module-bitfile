@@ -41,14 +41,20 @@ Puppet::Type.newtype :underscore_bit_file do
 		EOF
 	end
 
-	def bits
-		catalog.resources.select do |r|
+	def file_bits
+		@file_bits ||= catalog.resources.select do |r|
 			r.type == :underscore_bit_file_bit and r[:path] == self[:path]
 		end
 	end
 
+	def bit_node_content(parent)
+		file_bits.select { |r| r[:parent] == parent }.map do |r|
+			nl(r[:content]) + nl(bit_node_content(r[:name])) + nl(r[:closing_content])
+		end.join("\n")
+	end
+
 	def content
-		bits.sort_by { |r| [r[:ordinal], r[:content]] }.map { |r| r[:content] }.join("\n") + "\n"
+		bit_node_content(:undef)
 	end
 
 	def generate
@@ -70,5 +76,11 @@ Puppet::Type.newtype :underscore_bit_file do
 		f.builddepends.each { |e| f.catalog.relationship_graph.add_edge(e) }
 
 		[f]
+	end
+
+	private
+
+	def nl(s)
+		s.empty? ? '' : s + "\n"
 	end
 end
