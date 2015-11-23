@@ -49,8 +49,8 @@ Puppet::Type.newtype :underscore_bit_file do
 
 	def bit_node_content(parent)
 		file_bits.select { |r| r[:parent] == parent }.map do |r|
-			nl(r[:content]) + nl(bit_node_content(r[:name])) + nl(r[:closing_content])
-		end.join("\n")
+			[r[:ordinal], nl(r[:content]) + nl(bit_node_content(r[:name])) + nl(r[:closing_content])]
+		end.sort.map { |r| r.last }.join("")
 	end
 
 	def content
