@@ -60,9 +60,22 @@ Puppet::Type.newtype :underscore_bit_file_bit do
 		EOF
 
 		validate do |content|
-			unless content.is_a? String
+			unless content.is_a? String or content == :undef
 				raise ArgumentError,
 				      "`:content` must be a string"
+			end
+		end
+	end
+
+	newparam :source do
+		desc <<-EOF.gsub(/^\t\t\t/, '')
+			The file from which to read the contents of this bit.
+		EOF
+
+		validate do |source|
+			unless source.is_a? String or source == :undef
+				raise ArgumentError,
+				      "`:source` must be a string"
 			end
 		end
 	end
