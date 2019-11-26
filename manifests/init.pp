@@ -7,9 +7,5 @@ define bitfile(
 		mode      => $mode,
 		owner     => $owner,
 		group     => $group,
-		before    => $before,
-		require   => $require,
-		notify    => $notify,
-		subscribe => $subscribe,
 	}
 }
