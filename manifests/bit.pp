@@ -17,9 +17,5 @@ define bitfile::bit(
 		content         => $content,
 		source          => $source,
 		closing_content => $closing_content,
-		before          => $before,
-		require         => $require,
-		notify          => $notify,
-		subscribe       => $subscribe,
 	}
 }
